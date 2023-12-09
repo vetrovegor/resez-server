@@ -1,7 +1,10 @@
+import { Op } from "sequelize";
+
 import { Collection } from "../db/models.js";
 import QAService from "./QA-service.js";
 import userService from "./user-service.js";
 import { CollectionShortInfo } from "../dto/collection/collection-short-info.js";
+import { CollectionFullInfo } from "../dto/collection/collection-full-info.js";
 import { PaginationDto } from "../dto/pagination-dto.js";
 
 class CollectionService {
@@ -65,6 +68,25 @@ class CollectionService {
             limit,
             offset
         );
+    }
+
+    async getCollectionById(collectionId, userId) {
+        const existedCollection = await Collection.findOne({
+            where: {
+                id: collectionId,
+                [Op.or]: [{ isPrivate: false }, { userId: userId }],
+            },
+        });
+
+        if (!existedCollection) {
+            throw ApiError.notFound("Коллекция не найдена");
+        }
+
+        const QAPairs = await QAService.getQAPairsByCollectionId(collectionId);
+
+        const user = await userService.getUserById(existedCollection.userId);
+
+        return new CollectionFullInfo(existedCollection, user, QAPairs);
     }
 }
 

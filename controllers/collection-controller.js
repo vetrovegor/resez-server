@@ -47,6 +47,30 @@ class CollectionController {
             next(e);
         }
     }
+
+    async getCollectionById(req, res, next) {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return next(
+                    ApiError.badRequest("Ошибка валидации", errors.array())
+                );
+            }
+
+            const { id: collectionId } = req.params;
+            const { id: userId } = req.user;
+
+            const collection = await collectionService.getCollectionById(
+                collectionId,
+                userId
+            );
+
+            res.json({ collection });
+        } catch (e) {
+            next(e);
+        }
+    }
 }
 
 export default new CollectionController();

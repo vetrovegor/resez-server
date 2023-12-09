@@ -28,3 +28,11 @@ collectionRouter.get(
     blockedMiddleware,
     collectionController.getUserCollections
 );
+
+collectionRouter.get(
+    "/:id",
+    param("id").isNumeric(),
+    accessTokenMiddleware,
+    blockedMiddleware,
+    collectionController.getCollectionById
+);
