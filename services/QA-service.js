@@ -27,6 +27,12 @@ class QAService {
 
         return QAItems.map((QAItem) => new QADto(QAItem));
     }
+
+    async deleteQAByCollectionId(collectionId) {
+        return await QA.destroy({
+            where: { collectionId },
+        });
+    }
 }
 
 export default new QAService();

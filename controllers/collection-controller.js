@@ -95,6 +95,41 @@ class CollectionController {
             next(e);
         }
     }
+
+    async updateCollectionById(req, res, next) {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return next(
+                    ApiError.badRequest("Ошибка валидации", errors.array())
+                );
+            }
+
+            const {
+                id: collectionId,
+                collection,
+                description,
+                isPrivate,
+                QAPairs,
+            } = req.body;
+            const { id: userId } = req.user;
+
+            const updatedCollection =
+                await collectionService.updateCollectionById(
+                    collectionId,
+                    userId,
+                    collection,
+                    description,
+                    isPrivate,
+                    QAPairs
+                );
+
+            res.json({ collection: updatedCollection });
+        } catch (e) {
+            next(e);
+        }
+    }
 }
 
 export default new CollectionController();

@@ -114,6 +114,35 @@ class CollectionService {
 
         return await this.createCollectionDto(collection, pairsCount);
     }
+
+    async updateCollectionById(
+        collectionId,
+        userId,
+        collection,
+        description,
+        isPrivate,
+        QAPairs
+    ) {
+        const collectionData = await this.findUserCollection(
+            collectionId,
+            userId
+        );
+
+        if (!collectionData) {
+            throw ApiError.notFound("Коллекция не найдена");
+        }
+
+        collectionData.collection = collection;
+        collectionData.description = description;
+        collectionData.isPrivate = isPrivate;
+
+        await collectionData.save();
+
+        await QAService.deleteQAByCollectionId(collectionId);
+        await QAService.createQAFromPairs(QAPairs, collectionId);
+
+        return await this.createCollectionDto(collectionData, QAPairs.length);
+    }
 }
 
 export default new CollectionService();

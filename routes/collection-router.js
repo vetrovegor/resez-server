@@ -44,3 +44,16 @@ collectionRouter.delete(
     blockedMiddleware,
     collectionController.deleteCollection
 );
+
+collectionRouter.put(
+    "/",
+    body("collection").isString().isLength({ max: 75 }),
+    body("description").isString().optional().isLength({ max: 500 }),
+    body("isPrivate").isBoolean(),
+    body("QAPairs").isArray({ min: 2 }),
+    body("QAPairs.*.question").isString().isLength({ max: 250 }),
+    body("QAPairs.*.answer").isString().isLength({ max: 250 }),
+    accessTokenMiddleware,
+    blockedMiddleware,
+    collectionController.updateCollectionById
+);
