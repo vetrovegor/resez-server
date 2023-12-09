@@ -71,6 +71,30 @@ class CollectionController {
             next(e);
         }
     }
+
+    async deleteCollection(req, res, next) {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return next(
+                    ApiError.badRequest("Ошибка валидации", errors.array())
+                );
+            }
+
+            const { id: userId } = req.user;
+            const { id: collectionId } = req.params;
+
+            const deletedCollection = await collectionService.deleteCollection(
+                collectionId,
+                userId
+            );
+
+            res.json({ collection: deletedCollection });
+        } catch (e) {
+            next(e);
+        }
+    }
 }
 
 export default new CollectionController();

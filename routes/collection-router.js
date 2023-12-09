@@ -36,3 +36,11 @@ collectionRouter.get(
     blockedMiddleware,
     collectionController.getCollectionById
 );
+
+collectionRouter.delete(
+    "/:id",
+    param("id").isNumeric(),
+    accessTokenMiddleware,
+    blockedMiddleware,
+    collectionController.deleteCollection
+);

@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 
 import { Collection } from "../db/models.js";
+import { ApiError } from "../errors/api-error.js";
 import QAService from "./QA-service.js";
 import userService from "./user-service.js";
 import { CollectionShortInfo } from "../dto/collection/collection-short-info.js";
@@ -87,6 +88,31 @@ class CollectionService {
         const user = await userService.getUserById(existedCollection.userId);
 
         return new CollectionFullInfo(existedCollection, user, QAPairs);
+    }
+
+    async findUserCollection(collectionId, userId) {
+        return await Collection.findOne({
+            where: {
+                id: collectionId,
+                userId,
+            },
+        });
+    }
+
+    async deleteCollection(collectionId, userId) {
+        const collection = await this.findUserCollection(collectionId, userId);
+
+        if (!collection) {
+            throw ApiError.notFound("Коллекция не найдена");
+        }
+
+        const pairsCount = await QAService.getCollectionPairsCount(
+            collectionId
+        );
+
+        await collection.destroy();
+
+        return await this.createCollectionDto(collection, pairsCount);
     }
 }
 
