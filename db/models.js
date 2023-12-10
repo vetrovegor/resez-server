@@ -191,6 +191,45 @@ Collection.hasMany(QA, {
 });
 QA.belongsTo(Collection);
 
+const Role = sequelize.define('role', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    role: { type: DataTypes.STRING },
+    textColor: { type: DataTypes.STRING },
+    backgroundColor: { type: DataTypes.STRING }
+});
+
+const Permission = sequelize.define('permission', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    permission: { type: DataTypes.STRING },
+    parentId: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: 'permissions',
+            key: 'id'
+        }
+    }
+});
+
+const UserRole = sequelize.define('user_role', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
+});
+
+const RolePermission = sequelize.define('role_permission', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true }
+});
+
+Role.belongsToMany(Permission, { through: RolePermission });
+Permission.belongsToMany(Role, { through: RolePermission });
+
+Role.belongsToMany(User, { through: UserRole });
+User.belongsToMany(Role, { through: UserRole });
+
+Role.hasMany(UserRole);
+UserRole.belongsTo(Role);
+
+Permission.hasMany(RolePermission);
+RolePermission.belongsTo(Permission);
+
 export {
     User,
     Token,
@@ -204,4 +243,8 @@ export {
     ScoreConversion,
     Collection,
     QA,
+    Permission,
+    Role,
+    UserRole,
+    RolePermission,
 };
