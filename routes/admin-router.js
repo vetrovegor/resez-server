@@ -90,3 +90,4 @@ accessTokenMiddleware,
 blockedMiddleware,
 permissionMiddleware(PERMISSIONS.BLOCK_USERS),
 userController.unblock);
+
