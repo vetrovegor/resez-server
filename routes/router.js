@@ -14,3 +14,5 @@ router.use("/auth", authRouter);
 router.use("/collection", collectionRouter);
 
 router.use('/admin', adminRouter);
+
+router.use('/user', userRouter);
