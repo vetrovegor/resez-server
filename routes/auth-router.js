@@ -31,3 +31,22 @@ authRouter.get(
     refreshTokenMiddleware,
     authController.checkAuth
 );
+
+authRouter.post('/send-recovery-password-code',
+    body('phoneNumber').matches(/^\+7\d{10}$/),
+    authController.sendRecoveryPasswordCode);
+
+authRouter.post('/verify-recovery-password-code',
+    body('phoneNumber').matches(/^\+7\d{10}$/),
+    body('code').matches(/^[0-9]{6}$/),
+    phoneNumberMiddleware,
+    telegramMiddleware,
+    authController.verifyRecoveryPasswordCode);
+
+authRouter.put('/recovery-password',
+    body('phoneNumber').matches(/^\+7\d{10}$/),
+    body('code').matches(/^[0-9]{6}$/),
+    body('password').isLength({ min: 8, max: 32 }),
+    phoneNumberMiddleware,
+    telegramMiddleware,
+    authController.recoveryPassword);

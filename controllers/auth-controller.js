@@ -89,6 +89,61 @@ class AuthController {
             next(e);
         }
     }
+
+    async sendRecoveryPasswordCode(req, res, next) {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return next(ApiError.badRequest('Ошибка валидации', errors.array()));
+            }
+            const { phoneNumber } = req.body;
+
+            const response = await codeService.sendRecoveryPasswordCode(phoneNumber);
+
+            return res.json(response);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async verifyRecoveryPasswordCode(req, res, next) {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return next(ApiError.badRequest('Ошибка валидации', errors.array()));
+            }
+
+            const { id } = req.user;
+            const { code } = req.body;
+
+            const response = await codeService.verifyRecoveryPasswordCode(id, code);
+
+            return res.json(response);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async recoveryPassword(req, res, next) {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                return next(ApiError.badRequest('Ошибка валидации', errors.array()));
+            }
+
+            const { id } = req.user;
+            const { code, password } = req.body;
+
+            const response = await authService.recoveryPassword(id, code, password);
+
+            res.json(response);
+        } catch (e) {
+            next(e);
+        }
+    }
 }
 
 export default new AuthController();

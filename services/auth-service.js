@@ -55,6 +55,31 @@ class AuthService {
             user: userShortInfo
         }
     }
+
+    async updatePassword(id, password) {
+        const hashPassword = await bcrypt.hash(password, 3);
+
+        const user = await User.findOne({ where: { id } });
+        user.password = hashPassword;
+        return await user.save();
+    }
+
+    async recoveryPassword(userId, code, password) {
+        const codeData = await codeService.validateCode(userId, code, process.env.RECOVERY_CODE_TYPE);
+
+        if (!codeData) {
+            throw ApiError.badRequest('Код истек');
+        }
+
+        const { id: codeId } = codeData;
+        codeService.deleteCodeById(codeId);
+
+        await userService.updatePassword(userId, password);
+
+        await logService.createRecoveryPasswordLogEntry(userId);
+
+        return { error: false, message: 'Успешно' };
+    }
 }
 
 export default new AuthService();
