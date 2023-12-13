@@ -230,6 +230,31 @@ UserRole.belongsTo(Role);
 Permission.hasMany(RolePermission);
 RolePermission.belongsTo(Permission);
 
+const Notify = sequelize.define('notify', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    title: { type: DataTypes.STRING },
+    content: { type: DataTypes.TEXT },
+    sender: { type: DataTypes.STRING },
+});
+
+const UserNotify = sequelize.define('user_notifies', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    isRead: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isSent: { type: DataTypes.BOOLEAN, defaultValue: true },
+    date: { type: DataTypes.DATE }
+});
+
+const NotifyType = sequelize.define('notify_type', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    type: { type: DataTypes.STRING }
+});
+
+Notify.belongsToMany(User, { through: UserNotify });
+User.belongsToMany(Notify, { through: UserNotify });
+
+NotifyType.hasMany(Notify);
+Notify.belongsTo(NotifyType);
+
 export {
     User,
     Token,
@@ -247,4 +272,7 @@ export {
     Role,
     UserRole,
     RolePermission,
+    Notify,
+    UserNotify,
+    NotifyType,
 };
