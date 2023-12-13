@@ -59,7 +59,7 @@ adminRouter.get('/permission',
     permissionMiddleware(PERMISSIONS.CREATE_ROLES),
     permissionController.getPermissionsHierarchy);
 
-    adminRouter.post('/notify',
+adminRouter.post('/notify',
     body('title').notEmpty().isLength({ max: 100 }),
     body('userIDs').isArray(),
     body('date').optional().isISO8601(),
@@ -198,3 +198,52 @@ adminRouter.post('/score-conversion',
     permissionMiddleware(PERMISSIONS.CREATE_SUBJECTS),
     scoreConversionController.saveScoreConversion);
 
+    adminRouter.post('/task',
+    body('subThemeId').isNumeric(),
+    body('task').isString().notEmpty(),
+    body('isVerified').isBoolean(),
+    accessTokenMiddleware,
+    blockedMiddleware,
+    permissionMiddleware(PERMISSIONS.CREATE_TASKS),
+    verifiedTaskMiddleware,
+    taskController.createTask);
+
+adminRouter.get('/task',
+    paginationMiddleware,
+    accessTokenMiddleware,
+    blockedMiddleware,
+    permissionMiddleware(PERMISSIONS.TASKS),
+    taskController.getTasks);
+
+adminRouter.delete('/task/:id',
+    param('id').isNumeric(),
+    accessTokenMiddleware,
+    blockedMiddleware,
+    permissionMiddleware(PERMISSIONS.DELETE_TASKS),
+    taskController.deleteTaskById);
+
+adminRouter.get('/task/:id',
+    param('id').isNumeric(),
+    paginationMiddleware,
+    accessTokenMiddleware,
+    blockedMiddleware,
+    permissionMiddleware(PERMISSIONS.TASKS),
+    taskController.getTaskAdminInfoById);
+
+adminRouter.put('/task',
+    body('id').isNumeric(),
+    body('subThemeId').isNumeric(),
+    body('task').isString().notEmpty(),
+    body('isVerified').isBoolean(),
+    accessTokenMiddleware,
+    blockedMiddleware,
+    permissionMiddleware(PERMISSIONS.UPDATE_TASKS),
+    verifiedTaskMiddleware,
+    taskController.updateTaskById);
+
+adminRouter.put('/task/:id/verify',
+    param('id').isNumeric(),
+    accessTokenMiddleware,
+    blockedMiddleware,
+    permissionMiddleware(PERMISSIONS.VERIFY_TASKS),
+    taskController.verifyTaskById);
