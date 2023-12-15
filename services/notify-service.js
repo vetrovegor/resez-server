@@ -106,6 +106,82 @@ class NotifyService {
 
         return notify;
     }
+
+    async getNotifies(userId, limit, offset, unread) {
+        const whereOptions = {
+            userId,
+            isSent: true,
+            date: {
+                [Op.lt]: Date.now()
+            }
+        };
+
+        if (unread && unread.toLowerCase() == 'true') {
+            whereOptions.isRead = false;
+        }
+
+        const userNotifies = await UserNotify.findAll({
+            where: whereOptions,
+            order: [['date', 'DESC']],
+            limit,
+            offset
+        });
+
+        const notifiesDtos = await Promise.all(
+            userNotifies.map(async userNotify => {
+                return await this.createNotifyDto(userNotify);
+            }));
+
+        const totalCount = await UserNotify.count({ where: whereOptions });
+
+        // возвращать, при необходимости
+        // const unreadNotifiesCount = await this.getUnreadNotifiesCount(userId);
+
+        return new PaginationDto("notifies", notifiesDtos, totalCount, limit, offset);
+    }
+
+    async readNotify(userId, notifyId) {
+        const userNotify = await UserNotify.findOne({
+            where: {
+                notifyId,
+                userId, date: {
+                    [Op.lt]: Date.now()
+                }
+            }
+        });
+
+        if (!userNotify) {
+            throw ApiError.badRequest('Уведомление не найдено');
+        }
+
+        const { isRead } = userNotify;
+
+        if (isRead) {
+            throw ApiError.badRequest('Уведомление уже прочитано');
+        }
+
+        userNotify.isRead = true;
+        await userNotify.save();
+
+        return await this.createNotifyDto(userNotify);
+    }
+
+    async readAllNotifies(userId, limit, offset) {
+        await UserNotify.update(
+            { isRead: true },
+            {
+                where: {
+                    userId,
+                    isRead: false,
+                    date: {
+                        [Op.lt]: Date.now()
+                    }
+                }
+            }
+        );
+
+        return await this.getNotifies(userId, limit, offset);
+    }
 }
 
 export default new NotifyService();

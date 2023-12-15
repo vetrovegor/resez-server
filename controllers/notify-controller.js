@@ -39,6 +39,45 @@ class NotifyController {
             next(e);
         }
     }
+
+    async getNotifies(req, res, next) {
+        try {
+            const { id: userId } = req.user;
+            const { limit, offset, unread } = req.query;
+
+            const response = await notifyService.getNotifies(userId, limit, offset, unread);
+
+            res.json(response);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async readNotify(req, res, next) {
+        try {
+            const { id: userId } = req.user;
+            const { notifyId } = req.body;
+
+            const notify = await notifyService.readNotify(userId, notifyId);
+
+            res.json({ notify });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async readAllNotifies(req, res, next) {
+        try {
+            const { id: userId } = req.user;
+            const { limit, offset } = req.query;
+
+            const response = await notifyService.readAllNotifies(userId, limit, offset);
+
+            res.json(response);
+        } catch (e) {
+            next(e);
+        }
+    }
 }
 
 export default new NotifyController();
