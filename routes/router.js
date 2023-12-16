@@ -1,5 +1,5 @@
 import { Router } from "express";
-
+import { testRouter } from "./education/test-router.js";
 import { healthRouter } from "./health-router.js";
 import { authRouter } from "./auth-router.js";
 import { collectionRouter } from "./collection-router.js";
@@ -19,3 +19,5 @@ router.use('/admin', adminRouter);
 router.use('/user', userRouter);
 
 router.use('/notify', notifyRouter);
+
+router.use('/test', testRouter);
