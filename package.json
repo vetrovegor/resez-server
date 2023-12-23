@@ -23,7 +23,8 @@
     "geoip-lite": "^1.4.8",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
-    "sequelize": "^6.35.1"
+    "sequelize": "^6.35.1",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
